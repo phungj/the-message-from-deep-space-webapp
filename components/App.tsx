@@ -4,9 +4,11 @@ import ReferencePanel from "@/components/ReferencePanel";
 import TransmissionPanel from "@/components/TransmissionPanel";
 import ResponsePanel from "@/components/ResponsePanel";
 import {GameState, INITIAL_GAME_STATE} from "@/data/engine/state";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import HydrogenLineOffsetUnlockDialog from "@/components/HydrogenLineOffsetUnlockDialog";
 import GameCompletionDialog from "@/components/GameCompletionDialog";
+import {loadGame, saveGame} from "@/data/save";
+import TitleDialog from "@/components/TitleDialog";
 
 export type ReferenceDialog = "history" | "dictionary" | "";
 
@@ -15,6 +17,27 @@ export default function App() {
     const [referenceDialog, setReferenceDialog] = useState<ReferenceDialog>("");
     const [showHydrogenUnlock, setShowHydrogenUnlock] = useState(false);
     const [showCompletion, setShowCompletion] = useState(false);
+    const [hydrated, setHydrated] = useState(false);
+
+    useEffect(() => {
+        const savedState = loadGame();
+
+        if (savedState !== null) {
+            setGameState(savedState);
+        }
+
+        setHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (hydrated) {
+            saveGame(gameState);
+        }
+    }, [gameState, hydrated]);
+
+    if (!hydrated) {
+        return null;
+    }
 
     return (
         <div className="text-center h-screen">
@@ -32,6 +55,8 @@ export default function App() {
                 <TransmissionPanel state={gameState}/>
                 <ResponsePanel state={gameState} onStateChange={setGameState} onHydrogenOffsetUnlocked={() => setShowHydrogenUnlock(true)} onGameComplete={() => setShowCompletion(true)}/>
             </div>
+
+            <TitleDialog/>
             <HydrogenLineOffsetUnlockDialog
                 open={showHydrogenUnlock}
                 onClose={() => setShowHydrogenUnlock(false)}

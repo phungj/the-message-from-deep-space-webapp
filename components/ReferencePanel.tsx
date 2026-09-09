@@ -17,16 +17,16 @@ export default function ReferencePanel({state, referenceDialog, onOpenHistory, o
         <section className="relative border border-base-300 p-4">
             <h2 className="font-title text-heading text-5xl font-bold">REFERENCE</h2>
 
-            <div className="flex flex-col gap-2 mt-8">
+            <div className="flex flex-col gap-2 mt-8 items-center justify-center border border-base-300 mx-auto text-5xl w-[23ch] h-8/10">
                 <button
-                    className="btn btn-outline"
+                    className="btn btn-outline border-none rounded-none btn-primary mt-5 bg-white text-3xl text-black w-1/2"
                     onClick={onOpenHistory}
                 >
-                    TRANSMISSION HISTORY
+                    TRANSMISSIONS
                 </button>
 
                 <button
-                    className="btn btn-outline"
+                    className="btn btn-outline border-none rounded-none btn-primary mt-5 bg-white text-3xl text-black w-1/2"
                     onClick={onOpenDictionary}
                 >
                     DICTIONARY

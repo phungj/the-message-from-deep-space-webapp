@@ -19,11 +19,11 @@ export default function GameCompletionDialog({
                 </h2>
 
                 <p className="mt-4 text-justify text-2xl">
-                    The meteorite stops transmitting, for now.  The translation team eagerly awaits its next signals...
+                    The meteorite stops transmitting for now.  The translation team eagerly awaits its next signals...
                 </p>
 
                 <button
-                    className="btn btn-outline btn-primary mt-5 bg-white text-2xl text-black w-1/6"
+                    className="btn btn-outline border-none rounded-none btn-primary mt-5 bg-white text-2xl text-black w-1/6"
                     onClick={onClose}
                 >
                     Continue

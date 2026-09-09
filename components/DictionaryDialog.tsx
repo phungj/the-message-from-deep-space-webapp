@@ -85,16 +85,20 @@ export default function DictionaryDialog({
                 </h3>
 
                 <button
-                    className="btn btn-sm absolute right-0"
+                    className="btn btn-sm rounded-none border-none absolute right-0"
                     onClick={handleClose}
                 >
                     ×
                 </button>
             </div>
 
-            <div className="mt-6 flex gap-2">
+            <form className="mt-6 flex gap-2"
+                  onSubmit={event => {
+                      event.preventDefault();
+                      handleAdd();
+                  }}>
                 <input
-                    className="input input-bordered w-1/3
+                    className="input input-bordered bg-black w-1/3
                         [appearance:textfield]
                         [&::-webkit-inner-spin-button]:appearance-none
                         [&::-webkit-outer-spin-button]:appearance-none"
@@ -113,24 +117,28 @@ export default function DictionaryDialog({
                 />
 
                 <input
-                    className="input input-bordered flex-1 uppercase"
+                    className="input input-bordered bg-black flex-1 uppercase"
                     type="text"
                     placeholder="WORD"
+                    maxLength={16}
                     value={wordInput}
                     onChange={event => {
-                        setWordInput(event.target.value.toUpperCase());
-                        setError("");
+                        const value = event.target.value.toUpperCase();
+
+                        if (/^[A-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/.test(value)) {
+                            setWordInput(value);
+                            setError("");
+                        }
                     }}
                 />
 
                 <button
-                    className="btn btn-primary bg-white text-2xl text-black w-1/10"
-                    onClick={handleAdd}
+                    className="btn btn-primary border-none rounded-none bg-white text-2xl text-black w-1/10"
                     disabled={!canAdd}
                 >
                     ADD
                 </button>
-            </div>
+            </form>
 
             <div className="mt-2 h-6">
                 {error && (
@@ -140,7 +148,7 @@ export default function DictionaryDialog({
                 )}
             </div>
 
-            <div className="mt-4 flex flex-col gap-2 border border-base-300 overflow-y-auto h-85/100 pt-3 pr-4">
+            <div className="mt-4 flex flex-col gap-2 border border-base-300 overflow-y-auto h-84/100 pt-3 pr-4">
                 {entries.map(([signal, word]) => (
                     <div
                         key={signal}
@@ -155,7 +163,7 @@ export default function DictionaryDialog({
                         </span>
 
                         <button
-                            className="btn btn-sm btn-error bg-white text-2xl text-black w-1/6"
+                            className="btn btn-sm border-none rounded-none btn-error bg-white text-2xl text-black w-1/6"
                             onClick={() => handleDelete(Number(signal))}
                         >
                             DELETE

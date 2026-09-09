@@ -139,8 +139,6 @@ function getNextState(
     if (groupIndex + 1 < TRANSMISSION_GROUPS.length) {
         const nextGroup = TRANSMISSION_GROUPS[groupIndex + 1];
 
-        const completedHelloWorld = group.id === "hello-world";
-
         return {
             state: {
                 ...state,
@@ -202,4 +200,19 @@ export function getDisplayBase(
     return transmission.id >= DECIMAL_CONVERSION_UNLOCK_ID
         ? 10
         : 8;
+}
+
+export function isTransmissionGroupCompleted(
+    state: GameState,
+    groupIndex: number
+): boolean {
+    const currentGroupIndex = TRANSMISSION_GROUPS.findIndex(
+        group => group.id === state.currentGroupID
+    );
+
+    if (currentGroupIndex === -1) {
+        throw new Error(`Unknown transmission group: ${state.currentGroupID}`);
+    }
+
+    return groupIndex < currentGroupIndex;
 }

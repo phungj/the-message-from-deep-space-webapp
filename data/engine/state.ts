@@ -8,6 +8,6 @@ export interface GameState {
 
 export const INITIAL_GAME_STATE: GameState = {
     currentGroupID: "hello-world",
-    currentTransmissionID: 9,
+    currentTransmissionID: 1,
     dictionary: {},
 }

@@ -66,7 +66,7 @@ export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnl
             <button
                 onClick={handleSubmit}
                 disabled={displayingMessage}
-                className="btn btn-primary mt-10 bg-white text-5xl text-black w-1/4"
+                className="btn btn-primary border-none rounded-none mt-10 bg-white h-1/20 text-5xl text-black w-1/4"
             >
                 SEND
             </button>

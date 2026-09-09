@@ -11,6 +11,26 @@ const transmissions: Transmission[] = [
         id: 11,
         signals: [0o75, DEV_DICTIONARY["STOP"], 0o76, DEV_DICTIONARY["STOP"], 0o77, DEV_DICTIONARY["STOP"]],
         expectedAnswer: [0o100]
+    },
+    {
+        id: 12,
+        signals: [0o1, DEV_DICTIONARY["STOP"], 0o2, DEV_DICTIONARY["STOP"], 0o4, DEV_DICTIONARY["STOP"], 0o10, DEV_DICTIONARY["STOP"], 0o20, DEV_DICTIONARY["STOP"], 0o40, DEV_DICTIONARY["STOP"], 0o100, DEV_DICTIONARY["STOP"]],
+        expectedAnswer: [0o200]
+    },
+    {
+        id: 13,
+        signals: [0o0, DEV_DICTIONARY["STOP"], 0o1, DEV_DICTIONARY["STOP"], 0o2, DEV_DICTIONARY["STOP"], 0o3, DEV_DICTIONARY["STOP"], 0o4, DEV_DICTIONARY["STOP"], DEV_DICTIONARY["STOP"], 0o1, DEV_DICTIONARY["STOP"], 0o4, DEV_DICTIONARY["STOP"], 0o7, DEV_DICTIONARY["STOP"], 0o12, DEV_DICTIONARY["STOP"], DEV_DICTIONARY["STOP"], 0o10, DEV_DICTIONARY["STOP"], 0o6, DEV_DICTIONARY["STOP"], 0o4, DEV_DICTIONARY["STOP"]],
+        expectedAnswer: [0o2]
+    },
+    {
+        id: 14,
+        signals: [0o0, DEV_DICTIONARY["STOP"], 0o0, DEV_DICTIONARY["STOP"], 0o0, DEV_DICTIONARY["STOP"], 0o0, DEV_DICTIONARY["STOP"], DEV_DICTIONARY["STOP"], 0o1, DEV_DICTIONARY["STOP"], 0o3, DEV_DICTIONARY["STOP"], 0o5, DEV_DICTIONARY["STOP"]],
+        expectedAnswer: [0o7]
+    },
+    {
+        id: 15,
+        signals: [0o0, DEV_DICTIONARY["STOP"], 0o1, DEV_DICTIONARY["STOP"], 0o1, DEV_DICTIONARY["STOP"], 0o2, DEV_DICTIONARY["STOP"], 0o3, DEV_DICTIONARY["STOP"], 0o5, DEV_DICTIONARY["STOP"], 0o10, DEV_DICTIONARY["STOP"]],
+        expectedAnswer: [0o15]
     }
 ];
 

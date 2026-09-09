@@ -23,7 +23,7 @@ export default function HydrogenLineOffsetUnlockDialog({
                 </p>
 
                 <button
-                    className="btn btn-outline btn-primary mt-5 bg-white text-2xl text-black w-1/6"
+                    className="btn btn-outline border-none rounded-none btn-primary mt-5 bg-white text-2xl text-black w-1/6"
                     onClick={onClose}
                 >
                     Continue
