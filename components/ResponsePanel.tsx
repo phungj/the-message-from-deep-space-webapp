@@ -11,7 +11,8 @@ interface ResponsePanelProps {
 export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnlocked}: ResponsePanelProps) {
     const [input, setInput] = useState("");
 
-    function handleSubmit() {
+    async function handleSubmit() {
+        const currentInput = input;
         const result = submitAnswer(state, input);
 
         if (result.type === "correct") {
@@ -22,13 +23,22 @@ export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnl
                 onHydrogenOffsetUnlocked();
             }
 
+            setInput("NEW SIGNAL DETECTED!!")
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
             onStateChange(result.nextState);
             setInput("");
-        } else if (result.type === "wrong-answer") {
-            // We'll add feedback here later.
-        } else if (result.type === "parse-error") {
-            // We'll add parse-error feedback here later.
+            return;
         }
+
+        if (result.type === "wrong-answer") {
+            setInput("NO SIGNAL CHANGE");
+        } else {
+            setInput(`PARSE ERROR: ${result.error}`)
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setInput(currentInput)
     }
 
     return (
