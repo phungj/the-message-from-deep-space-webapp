@@ -5,6 +5,7 @@ import {
     getCurrentDisplayBase,
     getHistoricalDisplayBase
 } from "@/data/engine/engine";
+import {UserDictionary} from "@/data/transmissions/dictionary";
 
 export type ParseResult =
     | {
@@ -29,12 +30,16 @@ export interface DisplaySignal {
 function prepareSignals(
     signals: number[],
     base: 8 | 10,
-    hydrogenLineUnconverted: boolean
+    hydrogenLineUnconverted: boolean,
+    dictionary: UserDictionary
 ): DisplaySignal[] {
     return signals.map(signal => ({
-        value: signal.toString(base),
+        value: dictionary[signal] ?? signal.toString(base),
         prefix: signal < 0 ? "space" : "none",
-        postfix: signal < 0 || hydrogenLineUnconverted ? "newline" : "none"
+        postfix:
+            signal < 0 || hydrogenLineUnconverted
+                ? "newline"
+                : "none"
     }));
 }
 
@@ -56,14 +61,15 @@ export function prepareCurrentTransmissionSignals(
     return prepareSignals(
         converted,
         getCurrentDisplayBase(transmission, state),
-        hydrogenLineUnconverted
+        hydrogenLineUnconverted,
+        state.dictionary
     );
 }
 
 export function prepareHistoricalTransmissionSignals(
     signals: number[],
     transmission: Transmission,
-    state: GameState
+    state: GameState,
 ): DisplaySignal[] {
     const converted = convertFromTransmissionBasis(
         signals,
@@ -71,9 +77,15 @@ export function prepareHistoricalTransmissionSignals(
         state
     );
 
+    const hydrogenLineUnconverted =
+        transmission.signalBasis === "hydrogen" &&
+        !state.hydrogenOffsetUnlocked;
+
     return prepareSignals(
         converted,
-        getHistoricalDisplayBase(transmission)
+        getHistoricalDisplayBase(transmission),
+        hydrogenLineUnconverted,
+        state.dictionary
     );
 }
 

@@ -36,6 +36,12 @@ export default function ReferencePanel({state, referenceDialog, onOpenHistory, o
                 open={referenceDialog === "history"}
                 onClose={onCloseDialog}
             />
+
+            <DictionaryDialog
+                state={state}
+                open={referenceDialog === "dictionary"}
+                onClose={onCloseDialog}
+            />
         </section>
     );
 }
