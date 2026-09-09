@@ -9,26 +9,27 @@ type ReferencePanelProps = {
     onOpenHistory: () => void;
     onOpenDictionary: () => void;
     onCloseDialog: () => void;
+    onStateChange: (state: GameState) => void;
 }
 
-export default function ReferencePanel({state, referenceDialog, onOpenHistory, onOpenDictionary, onCloseDialog}: ReferencePanelProps) {
+export default function ReferencePanel({state, referenceDialog, onOpenHistory, onOpenDictionary, onCloseDialog, onStateChange}: ReferencePanelProps) {
     return (
         <section className="relative border border-base-300 p-4">
-            <h2 className="font-title text-heading text-5xl font-bold">Reference</h2>
+            <h2 className="font-title text-heading text-5xl font-bold">REFERENCE</h2>
 
             <div className="flex flex-col gap-2 mt-8">
                 <button
                     className="btn btn-outline"
                     onClick={onOpenHistory}
                 >
-                    Transmission History
+                    TRANSMISSION HISTORY
                 </button>
 
                 <button
                     className="btn btn-outline"
                     onClick={onOpenDictionary}
                 >
-                    Dictionary
+                    DICTIONARY
                 </button>
             </div>
 
@@ -42,6 +43,7 @@ export default function ReferencePanel({state, referenceDialog, onOpenHistory, o
                 state={state}
                 open={referenceDialog === "dictionary"}
                 onClose={onCloseDialog}
+                onStateChange={onStateChange}
             />
         </section>
     );

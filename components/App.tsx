@@ -6,6 +6,7 @@ import ResponsePanel from "@/components/ResponsePanel";
 import {GameState, INITIAL_GAME_STATE} from "@/data/engine/state";
 import {useState} from "react";
 import HydrogenLineOffsetUnlockDialog from "@/components/HydrogenLineOffsetUnlockDialog";
+import GameCompletionDialog from "@/components/GameCompletionDialog";
 
 export type ReferenceDialog = "history" | "dictionary" | "";
 
@@ -13,10 +14,11 @@ export default function App() {
     const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
     const [referenceDialog, setReferenceDialog] = useState<ReferenceDialog>("");
     const [showHydrogenUnlock, setShowHydrogenUnlock] = useState(false);
+    const [showCompletion, setShowCompletion] = useState(false);
 
     return (
         <div className="text-center h-screen">
-            <h1 className="font-title text-heading text-5xl font-bold mt-3">The Message from Deep Space</h1>
+            <h1 className="font-title text-heading text-5xl font-bold mt-3">THE MESSAGE FROM DEEP SPACE</h1>
 
             <div className="grid grid-cols-3 gap-4 p-6 h-9/10">
                 <ReferencePanel
@@ -25,14 +27,16 @@ export default function App() {
                     onOpenHistory={() => setReferenceDialog("history")}
                     onOpenDictionary={() => setReferenceDialog("dictionary")}
                     onCloseDialog={() => setReferenceDialog("")}
+                    onStateChange={setGameState}
                 />
                 <TransmissionPanel state={gameState}/>
-                <ResponsePanel state={gameState} onStateChange={setGameState} onHydrogenOffsetUnlocked={() => setShowHydrogenUnlock(true)}/>
+                <ResponsePanel state={gameState} onStateChange={setGameState} onHydrogenOffsetUnlocked={() => setShowHydrogenUnlock(true)} onGameComplete={() => setShowCompletion(true)}/>
             </div>
             <HydrogenLineOffsetUnlockDialog
                 open={showHydrogenUnlock}
                 onClose={() => setShowHydrogenUnlock(false)}
             />
+            <GameCompletionDialog open={showCompletion} onClose={() => setShowCompletion(false)}/>
         </div>
     );
 }

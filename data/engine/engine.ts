@@ -1,17 +1,18 @@
 import type { Transmission } from "@/data/transmissions/transmission";
 import type { GameState} from "@/data/engine/state";
 import {TRANSMISSION_GROUPS} from "@/data/transmissions/groups/groups";
-import {HYDROGEN_LINE} from "@/data/transmissions/transmission";
 import {
     DisplaySignal,
     parseSignalInput,
-    prepareCurrentTransmissionSignals
+    prepareTransmissionSignals
 } from "@/data/transmissions/parser";
 
 export type SubmitResult =
     | {
     type: "correct";
     nextState: GameState;
+    completed: boolean;
+    hydrogenOffsetUnlocked: boolean;
 }
     | {
     type: "wrong-answer";
@@ -46,40 +47,51 @@ export function getCurrentTransmission(state: GameState): Transmission {
 export function getDisplayedSignals(state: GameState): DisplaySignal[] {
     const transmission = getCurrentTransmission(state);
 
-    return prepareCurrentTransmissionSignals(
+    return prepareTransmissionSignals(
         transmission.signals,
         transmission,
         state
     );
 }
 
-export function submitAnswer(state: GameState, input: string): SubmitResult {
+export function submitAnswer(
+    state: GameState,
+    input: string
+): SubmitResult {
     const transmission = getCurrentTransmission(state);
 
-    const parsed = parseSignalInput(input, getCurrentDisplayBase(transmission, state));
+    const parsed = parseSignalInput(
+        input,
+        getDisplayBase(transmission),
+        state.dictionary
+    );
 
     if (!parsed.success) {
+        if (parsed.kind === "invalid-number") {
+            return {
+                type: "wrong-answer"
+            };
+        }
+
         return {
             type: "parse-error",
             error: parsed.error
         };
     }
 
-    const expectedAnswer = convertFromTransmissionBasis(
-        transmission.expectedAnswer,
-        transmission,
-        state
-    );
-
-    if (!answersEqual(parsed.signals, expectedAnswer)) {
+    if (!answersEqual(parsed.signals, transmission.expectedAnswer)) {
         return {
             type: "wrong-answer"
         };
     }
 
+    const nextState = getNextState(state);
+
     return {
         type: "correct",
-        nextState: getNextState(state)
+        nextState: nextState.state,
+        completed: nextState.completed,
+        hydrogenOffsetUnlocked: !isHydrogenOffsetUnlocked(state) && isHydrogenOffsetUnlocked(nextState.state)
     };
 }
 
@@ -90,7 +102,9 @@ function answersEqual(actual: number[], expected: number[]): boolean {
     );
 }
 
-function getNextState(state: GameState): GameState {
+function getNextState(
+    state: GameState
+): { state: GameState; completed: boolean } {
     const groupIndex = TRANSMISSION_GROUPS.findIndex(
         group => group.id === state.currentGroupID
     );
@@ -101,7 +115,9 @@ function getNextState(state: GameState): GameState {
 
     const group = TRANSMISSION_GROUPS[groupIndex];
 
-    const transmissionIndex = group.transmissions.findIndex(transmission => transmission.id === state.currentTransmissionID);
+    const transmissionIndex = group.transmissions.findIndex(
+        transmission => transmission.id === state.currentTransmissionID
+    );
 
     if (transmissionIndex === -1) {
         throw new Error(`Unknown transmission: ${state.currentTransmissionID}`);
@@ -110,9 +126,12 @@ function getNextState(state: GameState): GameState {
     // There is another transmission in this group.
     if (transmissionIndex + 1 < group.transmissions.length) {
         return {
-            ...state,
-            currentTransmissionID:
-            group.transmissions[transmissionIndex + 1].id
+            state: {
+                ...state,
+                currentTransmissionID:
+                group.transmissions[transmissionIndex + 1].id
+            },
+            completed: false
         };
     }
 
@@ -123,27 +142,20 @@ function getNextState(state: GameState): GameState {
         const completedHelloWorld = group.id === "hello-world";
 
         return {
-            ...state,
-            currentGroupID: nextGroup.id,
-            currentTransmissionID: nextGroup.transmissions[0].id,
-            hydrogenOffsetUnlocked: state.hydrogenOffsetUnlocked || completedHelloWorld
+            state: {
+                ...state,
+                currentGroupID: nextGroup.id,
+                currentTransmissionID: nextGroup.transmissions[0].id,
+            },
+            completed: false
         };
     }
 
-    // The entire game is complete.
+    // The entire currently-authored game is complete.
     return {
-        ...state,
-        // We'll eventually want something like:
-        // gameComplete: true
+        state,
+        completed: true
     };
-}
-
-export function convertFromTransmissionBasis(values: number[], transmission: Transmission, state: GameState): number[] {
-    if (transmission.signalBasis === "hydrogen" && state.hydrogenOffsetUnlocked) {
-        return values.map(value => value - HYDROGEN_LINE);
-    }
-
-    return values;
 }
 
 export function getTransmissionHistory(
@@ -168,26 +180,26 @@ export function getTransmissionHistory(
 }
 
 const DECIMAL_CONVERSION_UNLOCK_ID = 999;
+export const HYDROGEN_OFFSET_UNLOCK_ID = 10;
 
-export function getHistoricalDisplayBase(
+export function isDecimalConversionUnlocked(
     transmission: Transmission
-): 8 | 10 {
-    return transmission.id >= DECIMAL_CONVERSION_UNLOCK_ID ? 10 : 8;
+): boolean {
+    return transmission.id >= DECIMAL_CONVERSION_UNLOCK_ID;
 }
 
-export function getCurrentDisplayBase(
-    transmission: Transmission,
-    state: GameState
+export function isHydrogenOffsetUnlocked(state: GameState): boolean {
+    return state.currentTransmissionID >= HYDROGEN_OFFSET_UNLOCK_ID;
+}
+
+export function getDisplayBase(
+    transmission: Transmission
 ): 8 | 10 {
-    if (
-        transmission.signalBasis === "hydrogen"
-    ) {
+    if (transmission.signalBasis === "hydrogen") {
         return 10;
     }
 
-    return getCurrentBase(state);
-}
-
-function getCurrentBase(state: GameState): 8 | 10 {
-    return state.decimalConversionUnlocked ? 10 : 8;
+    return transmission.id >= DECIMAL_CONVERSION_UNLOCK_ID
+        ? 10
+        : 8;
 }

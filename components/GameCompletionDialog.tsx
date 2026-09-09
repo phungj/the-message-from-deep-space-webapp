@@ -1,12 +1,12 @@
-interface HydrogenLineOffsetUnlockDialogProps {
+interface GameCompletionDialogProps {
     open: boolean;
     onClose: () => void;
 }
 
-export default function HydrogenLineOffsetUnlockDialog({
+export default function GameCompletionDialog({
                                                  open,
                                                  onClose
-                                             }: HydrogenLineOffsetUnlockDialogProps) {
+                                             }: GameCompletionDialogProps) {
     if (!open) {
         return null;
     }
@@ -15,11 +15,11 @@ export default function HydrogenLineOffsetUnlockDialog({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
             <div className="w-full max-w-3xl border border-base-300 bg-black p-4">
                 <h2 className="text-4xl font-bold">
-                    Hydrogen Line Offset Unlocked
+                    End of Transmission
                 </h2>
 
                 <p className="mt-4 text-justify text-2xl">
-                    Dr. Akers notices that all of the signals are relative to the hydrogen line.  Dr. Bautista updates the compiler so all signals are now offset by that value automatically.
+                    The meteorite stops transmitting, for now.  The translation team eagerly awaits its next signals...
                 </p>
 
                 <button

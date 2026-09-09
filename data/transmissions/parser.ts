@@ -1,11 +1,11 @@
-import {Transmission} from "@/data/transmissions/transmission";
+import {HYDROGEN_LINE, Transmission} from "@/data/transmissions/transmission";
 import {GameState} from "@/data/engine/state";
-import {
-    convertFromTransmissionBasis,
-    getCurrentDisplayBase,
-    getHistoricalDisplayBase
-} from "@/data/engine/engine";
 import {UserDictionary} from "@/data/transmissions/dictionary";
+import {
+    getDisplayBase,
+    HYDROGEN_OFFSET_UNLOCK_ID,
+    isHydrogenOffsetUnlocked
+} from "@/data/engine/engine";
 
 export type ParseResult =
     | {
@@ -14,6 +14,7 @@ export type ParseResult =
 }
     | {
     success: false;
+    kind: "invalid-number" | "unknown-word";
     error: string;
     token: string;
     position: number;
@@ -43,52 +44,41 @@ function prepareSignals(
     }));
 }
 
-export function prepareCurrentTransmissionSignals(
+export function prepareTransmissionSignals(
     signals: number[],
     transmission: Transmission,
     state: GameState
 ): DisplaySignal[] {
-    const converted = convertFromTransmissionBasis(
-        signals,
-        transmission,
-        state
-    );
+    const isHydrogenTransmission =
+        transmission.signalBasis === "hydrogen";
+
+    const isPreOffsetTransmission =
+        transmission.id < HYDROGEN_OFFSET_UNLOCK_ID;
+
+    const hydrogenOffsetUnlocked =
+        isHydrogenOffsetUnlocked(state);
+
+    const shouldConvertHydrogen =
+        isHydrogenTransmission &&
+        isPreOffsetTransmission &&
+        hydrogenOffsetUnlocked;
+
+    const converted = shouldConvertHydrogen
+        ? signals.map(signal => signal - HYDROGEN_LINE)
+        : signals;
 
     const hydrogenLineUnconverted =
-        transmission.signalBasis === "hydrogen" &&
-        !state.hydrogenOffsetUnlocked;
+        isHydrogenTransmission &&
+        isPreOffsetTransmission &&
+        !hydrogenOffsetUnlocked;
 
     return prepareSignals(
         converted,
-        getCurrentDisplayBase(transmission, state),
+        getDisplayBase(transmission),
         hydrogenLineUnconverted,
         state.dictionary
     );
 }
-
-export function prepareHistoricalTransmissionSignals(
-    signals: number[],
-    transmission: Transmission,
-    state: GameState,
-): DisplaySignal[] {
-    const converted = convertFromTransmissionBasis(
-        signals,
-        transmission,
-        state
-    );
-
-    const hydrogenLineUnconverted =
-        transmission.signalBasis === "hydrogen" &&
-        !state.hydrogenOffsetUnlocked;
-
-    return prepareSignals(
-        converted,
-        getHistoricalDisplayBase(transmission),
-        hydrogenLineUnconverted,
-        state.dictionary
-    );
-}
-
 function separatorToString(separator: SignalSeparator): string {
     switch (separator) {
         case "space":
@@ -113,12 +103,13 @@ export function formatSignals(signals: DisplaySignal[]): string {
 
 export function parseSignalInput(
     input: string,
-    base: 8 | 10
+    base: 8 | 10,
+    dictionary: UserDictionary
 ): ParseResult {
     const tokens = input.trim().split(/\s+/);
 
     if (tokens.length === 1 && tokens[0] === "") {
-        return { success: true, signals: [] };
+        return {success: true, signals: []};
     }
 
     const signals: number[] = [];
@@ -126,22 +117,48 @@ export function parseSignalInput(
     for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
 
-        const valid =
-            base === 8
-                ? /^[0-7]+$/.test(token)
-                : /^\d+$/.test(token);
+        // Try dictionary words first.
+        const dictionaryEntry = Object.entries(dictionary).find(
+            ([, word]) => word === token.toUpperCase()
+        );
 
-        if (!valid) {
-            return {
-                success: false,
-                error: `Unrecognized signal: "${token}"`,
-                token,
-                position: i
-            };
+        if (dictionaryEntry) {
+            signals.push(Number(dictionaryEntry[0]));
+            continue;
         }
 
-        signals.push(parseInt(token, base));
+        // Is this a numeric input?
+        const isNumber = /^\d+$/.test(token);
+
+        if (isNumber) {
+            const valid =
+                base === 8
+                    ? /^[0-7]+$/.test(token)
+                    : true;
+
+            if (!valid) {
+                return {
+                    success: false,
+                    kind: "invalid-number",
+                    error: `Invalid number: "${token}"`,
+                    token,
+                    position: i
+                };
+            }
+
+            signals.push(parseInt(token, base));
+            continue;
+        }
+
+        // It's a word that isn't in the dictionary.
+        return {
+            success: false,
+            kind: "unknown-word",
+            error: `Unrecognized signal: "${token}"`,
+            token,
+            position: i
+        };
     }
 
-    return { success: true, signals };
+    return {success: true, signals};
 }

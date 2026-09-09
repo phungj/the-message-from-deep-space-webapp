@@ -1,7 +1,7 @@
 import {GameState} from "@/data/engine/state";
 import {getTransmissionHistory} from "@/data/engine/engine";
 import {useState} from "react";
-import {formatSignals, prepareCurrentTransmissionSignals} from "@/data/transmissions/parser";
+import {formatSignals, prepareTransmissionSignals} from "@/data/transmissions/parser";
 
 interface TransmissionHistoryDialogProps {
     state: GameState;
@@ -31,8 +31,8 @@ export default function TransmissionHistoryDialog({
             {!selectedTransmission ? (
                 <>
                     <div className="relative flex items-center justify-center">
-                        <h3 className="font-title text-3xl font-bold">
-                            Transmission History
+                        <h3 className="font-title text-heading text-5xl font-bold">
+                            TRANSMISSION HISTORY
                         </h3>
 
                         <button
@@ -59,7 +59,7 @@ export default function TransmissionHistoryDialog({
                 <>
                     <div className="relative flex items-center justify-center">
                         <h1 className="font-title text-5xl font-bold text-heading">
-                            Transmission {selectedTransmission.id}
+                            TRANSMISSION {selectedTransmission.id}
                         </h1>
 
                         <button
@@ -71,10 +71,10 @@ export default function TransmissionHistoryDialog({
                     </div>
 
                     <div className="overflow-y-auto text-left mt-8 w-[23ch] h-80/100 pl-2 pt-2 font-mono text-4xl whitespace-pre-wrap mx-auto border border-base-300">
-                        <h2 className="font-bold text-3xl text-center">Transmission</h2>
+                        <h2 className="font-bold text-3xl text-center">TRANSMISSION</h2>
                         <p className="font-mono text-4xl text-left whitespace-pre-wrap mt-2">
                             {formatSignals(
-                                prepareCurrentTransmissionSignals(
+                                prepareTransmissionSignals(
                                     selectedTransmission.signals,
                                     selectedTransmission,
                                     state
@@ -83,10 +83,10 @@ export default function TransmissionHistoryDialog({
                         </p>
 
                         <div className="mt-4">
-                            <h2 className="font-bold text-3xl text-center">Answer</h2>
+                            <h2 className="font-bold text-3xl text-center">ANSWER</h2>
                             <p className="font-mono text-4xl whitespace-pre-wrap mt-2">
                                 {formatSignals(
-                                    prepareCurrentTransmissionSignals(
+                                    prepareTransmissionSignals(
                                         selectedTransmission.expectedAnswer,
                                         selectedTransmission,
                                         state
@@ -97,10 +97,10 @@ export default function TransmissionHistoryDialog({
                     </div>
 
                     <button
-                        className="btn btn-primary mt-4 bg-white text-5xl text-black w-1/4"
+                        className="btn btn-primary mt-10 bg-white text-5xl text-black w-1/4"
                         onClick={() => setSelectedTransmissionID(-1)}
                     >
-                        Back
+                        BACK
                     </button>
                 </>
             )}

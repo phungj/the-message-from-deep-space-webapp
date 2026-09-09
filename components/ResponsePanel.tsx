@@ -6,30 +6,38 @@ interface ResponsePanelProps {
     state: GameState;
     onStateChange: (state: GameState) => void;
     onHydrogenOffsetUnlocked: () => void;
+    onGameComplete: () => void;
 }
 
-export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnlocked}: ResponsePanelProps) {
+export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnlocked, onGameComplete}: ResponsePanelProps) {
     const [input, setInput] = useState("");
+    const [displayingMessage, setDisplayingMessage] = useState(false);
 
     async function handleSubmit() {
         const currentInput = input;
         const result = submitAnswer(state, input);
 
         if (result.type === "correct") {
-            if (
-                !state.hydrogenOffsetUnlocked &&
-                result.nextState.hydrogenOffsetUnlocked
-            ) {
+            if (result.hydrogenOffsetUnlocked) {
                 onHydrogenOffsetUnlocked();
             }
 
+            if (result.completed) {
+                onGameComplete();
+                return;
+            }
+
+            setDisplayingMessage(true);
             setInput("NEW SIGNAL DETECTED!!")
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             onStateChange(result.nextState);
             setInput("");
+            setDisplayingMessage(false);
             return;
         }
+
+        setDisplayingMessage(true);
 
         if (result.type === "wrong-answer") {
             setInput("NO SIGNAL CHANGE");
@@ -39,26 +47,28 @@ export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnl
 
         await new Promise(resolve => setTimeout(resolve, 1000));
         setInput(currentInput)
+        setDisplayingMessage(false);
     }
 
     return (
         <section className="border border-base-300 p-4">
             <h2 className="font-title text-heading text-5xl font-bold">
-                Response
+                RESPONSE
             </h2>
 
             <textarea
                 value={input}
-                onChange={event => setInput(event.target.value)}
-                className="mt-8 block w-[23ch] h-80/100 resize-none overflow-y-auto font-mono mx-auto text-4xl border border-base-300 pl-2 pt-2"
-                placeholder="Enter response"
+                onChange={event => setInput(event.target.value.toUpperCase())}
+                disabled={displayingMessage}
+                className="mt-8 block w-[23ch] h-80/100 resize-none uppercase overflow-y-auto font-mono mx-auto text-4xl border border-base-300 pl-2 pt-2"
             />
 
             <button
                 onClick={handleSubmit}
-                className="btn btn-primary mt-4 bg-white text-5xl text-black w-1/4"
+                disabled={displayingMessage}
+                className="btn btn-primary mt-10 bg-white text-5xl text-black w-1/4"
             >
-                Send
+                SEND
             </button>
         </section>
     );
