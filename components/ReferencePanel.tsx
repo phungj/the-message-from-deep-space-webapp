@@ -1,6 +1,7 @@
 import TransmissionHistoryDialog from "@/components/TransmissionHistoryDialog";
 import {ReferenceDialog} from "@/components/App";
 import {GameState} from "@/data/engine/state";
+import DictionaryDialog from "@/components/DictionaryDialog";
 
 type ReferencePanelProps = {
     state: GameState;

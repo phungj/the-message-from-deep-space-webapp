@@ -7,5 +7,5 @@ interface DictionaryDialogProps {
 }
 
 export default function DictionaryDialog({state, open, onClose}: DictionaryDialogProps) {
-
+    return null;
 }
