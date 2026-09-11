@@ -78,7 +78,7 @@ export default function TransmissionHistoryDialog({
                                     className="mt-6 first:mt-0"
                                 >
                                     <h2 className="font-title text-heading text-3xl font-bold">
-                                        {groupIndex + 1} - {completed ? group.name : "???"}
+                                        GROUP {groupIndex + 1} - {completed ? group.name : "???"}
                                     </h2>
 
                                     <div className="flex flex-wrap gap-1 mt-2">

@@ -19,7 +19,7 @@ export default function HydrogenLineOffsetUnlockDialog({
                 </h2>
 
                 <p className="mt-4 text-justify text-2xl">
-                    Dr. Akers notices that all of the signals are relative to the hydrogen line.  Dr. Bautista updates the compiler so all signals are now offset by that value automatically.
+                    Dr. Bautista updates the signal compiler.  All signals are now offset by the hydrogen line automatically.
                 </p>
 
                 <button

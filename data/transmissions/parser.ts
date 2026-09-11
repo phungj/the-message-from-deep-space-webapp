@@ -34,14 +34,19 @@ function prepareSignals(
     hydrogenLineUnconverted: boolean,
     dictionary: UserDictionary
 ): DisplaySignal[] {
-    return signals.map(signal => ({
-        value: dictionary[signal] ?? signal.toString(base),
-        prefix: signal < 0 ? "space" : "none",
-        postfix:
-            signal < 0 || hydrogenLineUnconverted
-                ? "newline"
-                : "none"
-    }));
+    return signals.map(signal => {
+        const entry = dictionary[signal];
+
+        return {
+            value: entry?.word ?? signal.toString(base),
+            prefix: entry?.prefix ?? (signal < 0 ? "space" : "none"),
+            postfix:
+                entry?.postfix ??
+                (signal < 0 || hydrogenLineUnconverted
+                    ? "newline"
+                    : "none")
+        };
+    });
 }
 
 export function prepareTransmissionSignals(
@@ -98,6 +103,8 @@ export function formatSignals(signals: DisplaySignal[]): string {
             `${separatorToString(signal.prefix)}${signal.value}${separatorToString(signal.postfix)}`
         )
         .join("")
+        .replace(/[ \t]+/g, " ")
+        .replace(/ *\n */g, "\n")
         .trim();
 }
 
@@ -117,9 +124,8 @@ export function parseSignalInput(
     for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
 
-        // Try dictionary words first.
         const dictionaryEntry = Object.entries(dictionary).find(
-            ([, word]) => word === token.toUpperCase()
+            ([, entry]) => entry.word === token.toUpperCase()
         );
 
         if (dictionaryEntry) {

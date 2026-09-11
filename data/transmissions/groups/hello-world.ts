@@ -1,6 +1,6 @@
 import type {Transmission, TransmissionGroup} from "@/data/transmissions/transmission";
 import {HYDROGEN_LINE} from "@/data/transmissions/transmission";
-import {DEV_DICTIONARY} from "@/data/transmissions/dictionary";
+import {DEV_SIGNALS} from "@/data/transmissions/dictionary";
 
 const transmissions: Transmission[] = [
     {
@@ -41,19 +41,19 @@ const transmissions: Transmission[] = [
     },
     {
         id: 7,
-        signals: [HYDROGEN_LINE, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 1, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 2, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 3, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 4, HYDROGEN_LINE + DEV_DICTIONARY["STOP"]],
+        signals: [HYDROGEN_LINE, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 1, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 2, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 3, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 4, HYDROGEN_LINE + DEV_SIGNALS.STOP],
         signalBasis: "hydrogen",
         expectedAnswer: [HYDROGEN_LINE + 5]
     },
     {
         id: 8,
-        signals: [HYDROGEN_LINE, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 2, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 4, HYDROGEN_LINE + DEV_DICTIONARY["STOP"]],
+        signals: [HYDROGEN_LINE, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 2, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 4, HYDROGEN_LINE + DEV_SIGNALS.STOP],
         signalBasis: "hydrogen",
         expectedAnswer: [HYDROGEN_LINE + 6]
     },
     {
         id: 9,
-        signals: [HYDROGEN_LINE + 6, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 5, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 4, HYDROGEN_LINE + DEV_DICTIONARY["STOP"], HYDROGEN_LINE + 3, HYDROGEN_LINE + DEV_DICTIONARY["STOP"]],
+        signals: [HYDROGEN_LINE + 6, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 5, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 4, HYDROGEN_LINE + DEV_SIGNALS.STOP, HYDROGEN_LINE + 3, HYDROGEN_LINE + DEV_SIGNALS.STOP],
         signalBasis: "hydrogen",
         expectedAnswer: [HYDROGEN_LINE + 2]
     },

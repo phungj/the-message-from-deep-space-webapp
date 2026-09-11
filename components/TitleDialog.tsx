@@ -17,7 +17,7 @@ export default function TitleDialog() {
                 <h2 className="text-2xl font-bold mt-3">Inspired by the <a className="link" href="https://store.steampowered.com/app/4080030/The_Message_from_Deep_Space/">The Message from Deep Space</a></h2>
 
                 <p className="mt-3 text-justify text-2xl">
-                    This morning, May 13th, 1973, marks the beginning of the investigation of the world's first extraterrestrial contact.  Ten days ago, a meteor landed in Cape Espenberg, Alaska.  This meteor has an antenna, from which is has been broadcasting a radio transmission.  A 1.42 million kHz signal lasting 0.8066 seconds, pausing for just as long, and repeating.  Geoseismic stations detected the meteor's landing, and immediately after, a naval boat picked up the signal.  There is no doubt is it extraterrestrial.
+                    This morning, May 13th, 1973, marks the beginning of the investigation of the world's first extraterrestrial contact.  Ten days ago, a meteor landed in Cape Espenberg, Alaska.  This meteor has an antenna and has been broadcasting a radio transmission.  A 1.42 million kHz signal lasting 0.8066 seconds, pausing for just as long, and repeating.  Geoseismic stations detected the meteor's landing, and immediately after, a naval boat picked up the signal.  There is no doubt is it extraterrestrial.
                 </p>
                 <p className="mt-3 text-justify text-2xl whitespace-pre-line">
                     A translation team has been assembled as follows:

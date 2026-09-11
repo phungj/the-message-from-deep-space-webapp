@@ -1,12 +1,36 @@
 import {GameState} from "@/data/engine/state";
 import {useState} from "react";
-import {addDictionaryEntry, removeDictionaryEntry} from "@/data/transmissions/dictionary";
+import {
+    addDictionaryEntry,
+    removeDictionaryEntry
+} from "@/data/transmissions/dictionary";
+import {SignalSeparator} from "@/data/transmissions/parser";
 
 interface DictionaryDialogProps {
     state: GameState;
     open: boolean;
     onClose: () => void;
     onStateChange: (state: GameState) => void;
+}
+
+const SEPARATOR_OPTIONS: SignalSeparator[] = [
+    "none",
+    "space",
+    "newline",
+    "two-newlines"
+];
+
+function separatorLabel(separator: SignalSeparator): string {
+    switch (separator) {
+        case "none":
+            return "NONE";
+        case "space":
+            return "SPACE";
+        case "newline":
+            return "NEWLINE";
+        case "two-newlines":
+            return "TWO NEWLINES";
+    }
 }
 
 export default function DictionaryDialog({
@@ -24,13 +48,15 @@ export default function DictionaryDialog({
     }
 
     const entries = Object.entries(state.dictionary);
-    const canAdd = signalInput.trim() !== "" && wordInput.trim() !== "";
+    const canAdd =
+        signalInput.trim() !== "" &&
+        wordInput.trim() !== "";
 
     function handleAdd() {
         const signal = Number(signalInput);
 
         if (!Number.isInteger(signal) || signal >= 0) {
-            setError("OFFSET MUST BE NEGATIVE");
+            setError("SIGNAL MUST BE NEGATIVE");
             return;
         }
 
@@ -41,7 +67,10 @@ export default function DictionaryDialog({
             return;
         }
 
-        if (Object.values(state.dictionary).includes(word)) {
+        if (
+            Object.values(state.dictionary)
+                .some(entry => entry.word === word)
+        ) {
             setError("WORD ALREADY EXISTS");
             return;
         }
@@ -70,6 +99,29 @@ export default function DictionaryDialog({
         });
     }
 
+    function handleSeparatorChange(
+        signal: number,
+        type: "prefix" | "postfix",
+        value: SignalSeparator
+    ) {
+        const entry = state.dictionary[signal];
+
+        if (!entry) {
+            return;
+        }
+
+        onStateChange({
+            ...state,
+            dictionary: {
+                ...state.dictionary,
+                [signal]: {
+                    ...entry,
+                    [type]: value
+                }
+            }
+        });
+    }
+
     function handleClose() {
         setSignalInput("");
         setWordInput("");
@@ -92,11 +144,13 @@ export default function DictionaryDialog({
                 </button>
             </div>
 
-            <form className="mt-6 flex gap-2"
-                  onSubmit={event => {
-                      event.preventDefault();
-                      handleAdd();
-                  }}>
+            <form
+                className="mt-6 flex gap-2"
+                onSubmit={event => {
+                    event.preventDefault();
+                    handleAdd();
+                }}
+            >
                 <input
                     className="input input-bordered bg-black w-1/3
                         [appearance:textfield]
@@ -104,7 +158,7 @@ export default function DictionaryDialog({
                         [&::-webkit-outer-spin-button]:appearance-none"
                     type="text"
                     inputMode="numeric"
-                    placeholder="OFFSET"
+                    placeholder="SIGNAL"
                     value={signalInput}
                     onChange={event => {
                         const value = event.target.value;
@@ -125,7 +179,9 @@ export default function DictionaryDialog({
                     onChange={event => {
                         const value = event.target.value.toUpperCase();
 
-                        if (/^[A-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/.test(value)) {
+                        if (
+                            /^[A-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/.test(value)
+                        ) {
                             setWordInput(value);
                             setError("");
                         }
@@ -148,28 +204,93 @@ export default function DictionaryDialog({
                 )}
             </div>
 
-            <div className="mt-4 flex flex-col gap-2 border border-base-300 overflow-y-auto h-84/100 pt-3 pr-4">
-                {entries.map(([signal, word]) => (
-                    <div
-                        key={signal}
-                        className="flex items-center gap-2 p-2"
-                    >
-                        <span className="font-mono text-xl w-1/3">
-                            {signal}
-                        </span>
+            <div className="mt-4 border border-base-300 h-84/100 overflow-y-auto">
+                <table className="w-full">
+                    <thead>
+                    <tr className="border-b border-base-300">
+                        <th className="font-title text-lg font-normal py-2 px-2 text-center">
+                            SIGNAL
+                        </th>
 
-                        <span className="text-xl flex-1">
-                            {word}
-                        </span>
+                        <th className="font-title text-lg font-normal py-2 px-2 text-center">
+                            WORD
+                        </th>
 
-                        <button
-                            className="btn btn-sm border-none rounded-none btn-error bg-white text-2xl text-black w-1/6"
-                            onClick={() => handleDelete(Number(signal))}
-                        >
-                            DELETE
-                        </button>
-                    </div>
-                ))}
+                        <th className="font-title text-lg font-normal py-2 px-2 text-center">
+                            PREFIX
+                        </th>
+
+                        <th className="font-title text-lg font-normal py-2 px-2 text-center">
+                            POSTFIX
+                        </th>
+
+                        <th className="py-2 px-2" />
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {entries.map(([signal, entry]) => (
+                        <tr key={signal}>
+                            <td className="font-mono text-xl py-2 px-2 text-center">
+                                {signal}
+                            </td>
+
+                            <td className="text-xl py-2 px-2 text-center">
+                                {entry.word}
+                            </td>
+
+                            <td className="py-2 px-2">
+                                <select
+                                    className="select select-lg select-bordered bg-black w-50"
+                                    value={entry.prefix}
+                                    onChange={event =>
+                                        handleSeparatorChange(
+                                            Number(signal),
+                                            "prefix",
+                                            event.target.value as SignalSeparator
+                                        )
+                                    }
+                                >
+                                    {SEPARATOR_OPTIONS.map(option => (
+                                        <option key={option} value={option}>
+                                            {separatorLabel(option)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
+
+                            <td className="py-2 px-2">
+                                <select
+                                    className="select select-lg select-bordered bg-black w-50"
+                                    value={entry.postfix}
+                                    onChange={event =>
+                                        handleSeparatorChange(
+                                            Number(signal),
+                                            "postfix",
+                                            event.target.value as SignalSeparator
+                                        )
+                                    }
+                                >
+                                    {SEPARATOR_OPTIONS.map(option => (
+                                        <option key={option} value={option}>
+                                            {separatorLabel(option)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
+
+                            <td className="py-2 px-2 text-center">
+                                <button
+                                    className="btn btn-sm border-none rounded-none btn-error bg-white text-xl text-black w-24"
+                                    onClick={() => handleDelete(Number(signal))}
+                                >
+                                    DELETE
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
