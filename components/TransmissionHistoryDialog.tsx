@@ -110,12 +110,21 @@ export default function TransmissionHistoryDialog({
                             TRANSMISSION {selectedTransmission.id}
                         </h1>
 
-                        <button
-                            className="btn btn-sm border-none rounded-none absolute right-0"
-                            onClick={handleClose}
-                        >
-                            ×
-                        </button>
+                        <div className="absolute right-0 flex gap-1">
+                            <button
+                                className="btn btn-sm border-none rounded-none"
+                                onClick={() => setSelectedTransmissionID(-1)}
+                            >
+                                {'<'}
+                            </button>
+
+                            <button
+                                className="btn btn-sm border-none rounded-none"
+                                onClick={handleClose}
+                            >
+                                ×
+                            </button>
+                        </div>
                     </div>
 
                     <div className="overflow-y-auto text-left mt-8 w-[23ch] h-80/100 pl-2 pt-2 font-mono text-4xl whitespace-pre-wrap mx-auto border border-base-300">
@@ -149,13 +158,6 @@ export default function TransmissionHistoryDialog({
                             </p>
                         </div>
                     </div>
-
-                    <button
-                        className="btn btn-primary border-none mt-10 bg-white text-5xl text-black rounded-none w-1/4 h-1/20"
-                        onClick={() => setSelectedTransmissionID(-1)}
-                    >
-                        BACK
-                    </button>
                 </>
             )}
         </div>

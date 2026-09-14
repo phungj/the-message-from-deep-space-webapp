@@ -2,17 +2,19 @@ import TransmissionHistoryDialog from "@/components/TransmissionHistoryDialog";
 import {ReferenceDialog} from "@/components/App";
 import {GameState} from "@/data/engine/state";
 import DictionaryDialog from "@/components/DictionaryDialog";
+import LogDialog from "@/components/LogDialog";
 
 type ReferencePanelProps = {
     state: GameState;
     referenceDialog: ReferenceDialog;
     onOpenHistory: () => void;
     onOpenDictionary: () => void;
+    onOpenLog: () => void;
     onCloseDialog: () => void;
     onStateChange: (state: GameState) => void;
 }
 
-export default function ReferencePanel({state, referenceDialog, onOpenHistory, onOpenDictionary, onCloseDialog, onStateChange}: ReferencePanelProps) {
+export default function ReferencePanel({state, referenceDialog, onOpenHistory, onOpenDictionary, onOpenLog, onCloseDialog, onStateChange}: ReferencePanelProps) {
     return (
         <section className="relative border border-base-300 p-4">
             <h2 className="font-title text-heading text-5xl font-bold">REFERENCE</h2>
@@ -31,6 +33,13 @@ export default function ReferencePanel({state, referenceDialog, onOpenHistory, o
                 >
                     DICTIONARY
                 </button>
+
+                <button
+                    className="btn btn-outline border-none rounded-none btn-primary mt-5 bg-white text-3xl text-black w-1/2"
+                    onClick={onOpenLog}
+                >
+                    LOG
+                </button>
             </div>
 
             <TransmissionHistoryDialog
@@ -44,6 +53,12 @@ export default function ReferencePanel({state, referenceDialog, onOpenHistory, o
                 open={referenceDialog === "dictionary"}
                 onClose={onCloseDialog}
                 onStateChange={onStateChange}
+            />
+
+            <LogDialog
+                state={state}
+                open={referenceDialog === "log"}
+                onClose={onCloseDialog}
             />
         </section>
     );

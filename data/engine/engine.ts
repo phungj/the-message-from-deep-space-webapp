@@ -6,6 +6,7 @@ import {
     parseSignalInput,
     prepareTransmissionSignals
 } from "@/data/transmissions/parser";
+import {DECIMAL_CONVERSION_UNLOCK_ID, isHydrogenOffsetUnlocked} from "@/data/logs/log";
 
 export type SubmitResult =
     | {
@@ -175,19 +176,6 @@ export function getTransmissionHistory(
     }
 
     return history;
-}
-
-const DECIMAL_CONVERSION_UNLOCK_ID = 999;
-export const HYDROGEN_OFFSET_UNLOCK_ID = 10;
-
-export function isDecimalConversionUnlocked(
-    transmission: Transmission
-): boolean {
-    return transmission.id >= DECIMAL_CONVERSION_UNLOCK_ID;
-}
-
-export function isHydrogenOffsetUnlocked(state: GameState): boolean {
-    return state.currentTransmissionID >= HYDROGEN_OFFSET_UNLOCK_ID;
 }
 
 export function getDisplayBase(

@@ -37,6 +37,25 @@ export function addDictionaryEntry(
     };
 }
 
+export function updateDictionaryWord(
+    dictionary: UserDictionary,
+    signal: number,
+    word: string
+): UserDictionary {
+    const entry = dictionary[signal];
+
+    if (!entry) {
+        throw new Error(`Unknown dictionary signal: ${signal}`);
+    }
+
+    return {
+        ...dictionary,
+        [signal]: {
+            ...entry,
+            word
+        }
+    };
+}
 export function removeDictionaryEntry(
     dictionary: UserDictionary,
     signal: number

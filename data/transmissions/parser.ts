@@ -3,9 +3,8 @@ import {GameState} from "@/data/engine/state";
 import {UserDictionary} from "@/data/transmissions/dictionary";
 import {
     getDisplayBase,
-    HYDROGEN_OFFSET_UNLOCK_ID,
-    isHydrogenOffsetUnlocked
 } from "@/data/engine/engine";
+import {HYDROGEN_OFFSET_UNLOCK_ID, isHydrogenOffsetUnlocked} from "@/data/logs/log";
 
 export type ParseResult =
     | {

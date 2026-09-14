@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export default function TitleDialog() {
-    const titleDialogRef = useRef<HTMLDialogElement>(null);
+    const titleDialogRef = useRef<HTMLDialogElement | null>(null);
 
     useEffect(() => {
         titleDialogRef.current?.showModal();
