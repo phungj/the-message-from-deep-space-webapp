@@ -1,16 +1,16 @@
 import {LogEntry} from "@/data/logs/log";
 
-interface HydrogenLineOffsetUnlockDialogProps {
+interface DecimalConversionUnlockDialogProps {
     open: boolean;
     entry: LogEntry;
     onClose: () => void;
 }
 
-export default function HydrogenLineOffsetUnlockDialog({
+export default function DecimalConversionUnlockDialog({
                                                            open,
                                                            entry,
                                                            onClose
-                                                       }: HydrogenLineOffsetUnlockDialogProps) {
+                                                       }: DecimalConversionUnlockDialogProps) {
     if (!open) {
         return null;
     }

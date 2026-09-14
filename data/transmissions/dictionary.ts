@@ -11,7 +11,11 @@ export const DEV_SIGNALS = {
     ADD: -5,
     EQUALS: -4,
     MULTIPLY: -6,
-    DIVIDE: -8
+    DIVIDE: -8,
+    SUBTRACT: -7,
+    NEGATIVE: -1,
+    OCTAL_POINT: -10,
+    COMMA: -3
 } as const;
 
 export type UserDictionary = Record<number, DictionaryEntry>;

@@ -6,10 +6,11 @@ interface ResponsePanelProps {
     state: GameState;
     onStateChange: (state: GameState) => void;
     onHydrogenOffsetUnlocked: () => void;
+    onDecimalConversionUnlocked: () => void;
     onGameComplete: () => void;
 }
 
-export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnlocked, onGameComplete}: ResponsePanelProps) {
+export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnlocked, onDecimalConversionUnlocked, onGameComplete}: ResponsePanelProps) {
     const [input, setInput] = useState("");
     const [displayingMessage, setDisplayingMessage] = useState(false);
 
@@ -20,6 +21,10 @@ export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnl
         if (result.type === "correct") {
             if (result.hydrogenOffsetUnlocked) {
                 onHydrogenOffsetUnlocked();
+            }
+
+            if (result.decimalConversionUnlocked) {
+                onDecimalConversionUnlocked();
             }
 
             if (result.completed) {
@@ -58,7 +63,7 @@ export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnl
 
             <textarea
                 value={input}
-                onChange={event => setInput(event.target.value.toUpperCase())}
+                onChange={event => setInput(event.target.value)}
                 disabled={displayingMessage}
                 className="mt-8 block w-[23ch] h-80/100 resize-none uppercase overflow-y-auto font-mono mx-auto text-4xl border border-base-300 pl-2 pt-2"
             />

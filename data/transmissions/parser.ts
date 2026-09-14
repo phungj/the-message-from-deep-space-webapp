@@ -41,9 +41,11 @@ function prepareSignals(
             prefix: entry?.prefix ?? (signal < 0 ? "space" : "none"),
             postfix:
                 entry?.postfix ??
-                (signal < 0 || hydrogenLineUnconverted
+                (signal < 0
                     ? "newline"
-                    : "none")
+                    : hydrogenLineUnconverted
+                        ? "space"
+                        : "none")
         };
     });
 }
@@ -112,30 +114,39 @@ export function parseSignalInput(
     base: 8 | 10,
     dictionary: UserDictionary
 ): ParseResult {
-    const tokens = input.trim().split(/\s+/);
-
-    if (tokens.length === 1 && tokens[0] === "") {
-        return {success: true, signals: []};
-    }
+    const dictionaryEntries = Object.entries(dictionary)
+        .sort(([, a], [, b]) => b.word.length - a.word.length);
 
     const signals: number[] = [];
+    let position = 0;
 
-    for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
+    while (position < input.length) {
+        // Ignore whitespace.
+        if (/\s/.test(input[position])) {
+            position++;
+            continue;
+        }
 
-        const dictionaryEntry = Object.entries(dictionary).find(
-            ([, entry]) => entry.word === token.toUpperCase()
+        const remaining = input.slice(position);
+
+        // Try to match a dictionary word.
+        const dictionaryEntry = dictionaryEntries.find(
+            ([, entry]) =>
+                remaining.toUpperCase().startsWith(entry.word.toUpperCase())
         );
 
         if (dictionaryEntry) {
             signals.push(Number(dictionaryEntry[0]));
+            position += dictionaryEntry[1].word.length;
             continue;
         }
 
-        // Is this a numeric input?
-        const isNumber = /^\d+$/.test(token);
+        // Try to match a number.
+        const numberMatch = remaining.match(/^\d+/);
 
-        if (isNumber) {
+        if (numberMatch) {
+            const token = numberMatch[0];
+
             const valid =
                 base === 8
                     ? /^[0-7]+$/.test(token)
@@ -147,23 +158,29 @@ export function parseSignalInput(
                     kind: "invalid-number",
                     error: `Invalid number: "${token}"`,
                     token,
-                    position: i
+                    position
                 };
             }
 
             signals.push(parseInt(token, base));
+            position += token.length;
             continue;
         }
 
-        // It's a word that isn't in the dictionary.
+        // Nothing recognized at this position.
+        const token = input[position];
+
         return {
             success: false,
             kind: "unknown-word",
             error: `Unrecognized signal: "${token}"`,
             token,
-            position: i
+            position
         };
     }
 
-    return {success: true, signals};
+    return {
+        success: true,
+        signals
+    };
 }

@@ -1,1 +1,3 @@
-3 stop 3 add equals 2 stop 3
+0 comma 0 stop
+1 comma 1 stop
+2 comma 2 stop

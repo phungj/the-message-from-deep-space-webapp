@@ -8,6 +8,27 @@ interface Options {
     file?: string;
 }
 
+function printHelp(): void {
+    console.log(`
+Usage:
+  parse-transmission [options] [file]
+
+Options:
+  --base <8|10>    Interpret numeric signals as base 8 or base 10.
+                   Defaults to base 10.
+
+  -h, --help       Show this help message.
+
+Input:
+  If no file is provided, input is read from stdin.
+
+Examples:
+  parse-transmission transmission.txt
+  parse-transmission --base 8 transmission.txt
+  cat transmission.txt | parse-transmission --base 10
+`);
+}
+
 function parseArgs(): Options {
     const args = process.argv.slice(2);
 
@@ -16,6 +37,11 @@ function parseArgs(): Options {
 
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
+
+        if (arg === "-h" || arg === "--help") {
+            printHelp();
+            process.exit(0);
+        }
 
         if (arg === "--base") {
             const value = args[++i];

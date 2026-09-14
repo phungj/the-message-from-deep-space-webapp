@@ -46,17 +46,19 @@ export default function LogDialog({
                     </button>
                 </div>
 
-                <div className="flex flex-col items-center justify-center text-center mt-8 mx-auto border border-base-300 font-mono text-5xl w-[23ch] h-8/10 px-6 overflow-y-auto">
-                    <h4 className="font-title text-3xl font-bold uppercase">
-                        {selectedEntry.title}
-                    </h4>
+                <div className="mt-8 mx-auto w-4/5 h-8/10 flex flex-col">
+                    <div className="border border-base-300 font-mono text-3xl px-6 py-6 overflow-y-auto flex-1">
+                        <h4 className="font-title text-3xl font-bold uppercase text-center">
+                            {selectedEntry.title}
+                        </h4>
 
-                    <p className="mt-8 text-3xl text-center uppercase font-mono">
-                        {selectedEntry.content}
-                    </p>
+                        <p className="mt-8 text-3xl text-left uppercase font-mono whitespace-pre-line">
+                            {selectedEntry.content}
+                        </p>
+                    </div>
 
                     <button
-                        className="btn btn-outline border-none rounded-none btn-primary mt-10 bg-white text-4xl text-black w-1/4 font-mono"
+                        className="btn btn-outline border-none rounded-none btn-primary mt-6 bg-white text-4xl text-black w-1/4 font-mono mx-auto"
                         onClick={() => setSelectedLogID(null)}
                     >
                         BACK

@@ -1,12 +1,16 @@
 import type { Transmission } from "@/data/transmissions/transmission";
 import type { GameState} from "@/data/engine/state";
-import {TRANSMISSION_GROUPS} from "@/data/transmissions/groups/groups";
+import {TRANSMISSION_GROUPS} from "@/data/transmissions/groups/transmissionGroups";
 import {
     DisplaySignal,
     parseSignalInput,
     prepareTransmissionSignals
 } from "@/data/transmissions/parser";
-import {DECIMAL_CONVERSION_UNLOCK_ID, isHydrogenOffsetUnlocked} from "@/data/logs/log";
+import {
+    DECIMAL_CONVERSION_UNLOCK_ID,
+    isDecimalConversionUnlocked,
+    isHydrogenOffsetUnlocked
+} from "@/data/logs/log";
 
 export type SubmitResult =
     | {
@@ -14,6 +18,7 @@ export type SubmitResult =
     nextState: GameState;
     completed: boolean;
     hydrogenOffsetUnlocked: boolean;
+    decimalConversionUnlocked: boolean;
 }
     | {
     type: "wrong-answer";
@@ -92,7 +97,12 @@ export function submitAnswer(
         type: "correct",
         nextState: nextState.state,
         completed: nextState.completed,
-        hydrogenOffsetUnlocked: !isHydrogenOffsetUnlocked(state) && isHydrogenOffsetUnlocked(nextState.state)
+        hydrogenOffsetUnlocked:
+            !isHydrogenOffsetUnlocked(state) &&
+            isHydrogenOffsetUnlocked(nextState.state),
+        decimalConversionUnlocked:
+            !isDecimalConversionUnlocked(state) &&
+            isDecimalConversionUnlocked(nextState.state)
     };
 }
 
