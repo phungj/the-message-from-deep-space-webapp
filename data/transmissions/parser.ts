@@ -37,7 +37,11 @@ function prepareSignals(
         const entry = dictionary[signal];
 
         return {
-            value: entry?.word ?? (signal < 0 ? signal.toString(10) : signal.toString(base)),
+            value: entry?.word ?? (
+                signal < 0
+                    ? signal.toString(10)
+                    : signal.toString(base)
+            ),
             prefix: entry?.prefix ?? (signal < 0 ? "space" : "none"),
             postfix:
                 entry?.postfix ??
@@ -59,7 +63,7 @@ export function prepareTransmissionSignals(
         transmission.signalBasis === "hydrogen";
 
     const isPreOffsetTransmission =
-        transmission.id < HYDROGEN_OFFSET_UNLOCK_ID;
+        transmission.id <= HYDROGEN_OFFSET_UNLOCK_ID;
 
     const hydrogenOffsetUnlocked =
         isHydrogenOffsetUnlocked(state);

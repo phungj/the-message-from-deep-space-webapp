@@ -16,6 +16,7 @@ import {
     DECIMAL_CONVERSION_LOG_ID,
     LogEntry
 } from "@/data/logs/log";
+import {addUndefinedSignalsForCurrentTransmission} from "@/data/engine/engine";
 
 export type ReferenceDialog = "history" | "dictionary" | "log" | "";
 
@@ -36,7 +37,9 @@ export default function App() {
         const savedState = loadGame();
 
         if (savedState !== null) {
-            setGameState(savedState);
+            setGameState(
+                addUndefinedSignalsForCurrentTransmission(savedState)
+            );
         }
 
         setHydrated(true);

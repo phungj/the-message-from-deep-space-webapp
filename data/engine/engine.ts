@@ -11,6 +11,7 @@ import {
     isDecimalConversionUnlocked,
     isHydrogenOffsetUnlocked
 } from "@/data/logs/log";
+import {createUndefinedEntry} from "@/data/transmissions/dictionary";
 
 export type SubmitResult =
     | {
@@ -136,12 +137,16 @@ function getNextState(
 
     // There is another transmission in this group.
     if (transmissionIndex + 1 < group.transmissions.length) {
+        const nextTransmission =
+            group.transmissions[transmissionIndex + 1];
+
+        const nextState = {
+            ...state,
+            currentTransmissionID: nextTransmission.id
+        };
+
         return {
-            state: {
-                ...state,
-                currentTransmissionID:
-                group.transmissions[transmissionIndex + 1].id
-            },
+            state: addUndefinedSignalsForCurrentTransmission(nextState),
             completed: false
         };
     }
@@ -150,12 +155,14 @@ function getNextState(
     if (groupIndex + 1 < TRANSMISSION_GROUPS.length) {
         const nextGroup = TRANSMISSION_GROUPS[groupIndex + 1];
 
+        const nextState = {
+            ...state,
+            currentGroupID: nextGroup.id,
+            currentTransmissionID: nextGroup.transmissions[0].id
+        };
+
         return {
-            state: {
-                ...state,
-                currentGroupID: nextGroup.id,
-                currentTransmissionID: nextGroup.transmissions[0].id,
-            },
+            state: addUndefinedSignalsForCurrentTransmission(nextState),
             completed: false
         };
     }
@@ -213,4 +220,33 @@ export function isTransmissionGroupCompleted(
     }
 
     return groupIndex < currentGroupIndex;
+}
+
+function addUndefinedSignalsToDictionary(
+    state: GameState,
+    signals: number[]
+): GameState {
+    const dictionary = { ...state.dictionary };
+
+    for (const signal of signals) {
+        if (signal < 0 && dictionary[signal] === undefined) {
+            dictionary[signal] = createUndefinedEntry(signal);
+        }
+    }
+
+    return {
+        ...state,
+        dictionary
+    };
+}
+
+export function addUndefinedSignalsForCurrentTransmission(
+    state: GameState
+): GameState {
+    const transmission = getCurrentTransmission(state);
+
+    return addUndefinedSignalsToDictionary(
+        state,
+        transmission.signals
+    );
 }

@@ -68,3 +68,11 @@ export function removeDictionaryEntry(
     delete next[signal];
     return next;
 }
+
+export function createUndefinedEntry(signal: number): DictionaryEntry {
+    return {
+        word: `@${signal}_UNDEF`,
+        prefix: "space",
+        postfix: "newline"
+    };
+}
