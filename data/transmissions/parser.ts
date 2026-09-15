@@ -37,7 +37,7 @@ function prepareSignals(
         const entry = dictionary[signal];
 
         return {
-            value: entry?.word ?? signal.toString(base),
+            value: entry?.word ?? (signal < 0 ? signal.toString(10) : signal.toString(base)),
             prefix: entry?.prefix ?? (signal < 0 ? "space" : "none"),
             postfix:
                 entry?.postfix ??
