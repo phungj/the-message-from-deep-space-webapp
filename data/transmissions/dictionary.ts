@@ -15,7 +15,9 @@ export const DEV_SIGNALS = {
     SUBTRACT: -7,
     NEGATIVE: -1,
     OCTAL_POINT: -10,
-    COMMA: -3
+    COMMA: -3,
+    VAR: -11,
+    WHAT: -12
 } as const;
 
 export type UserDictionary = Record<number, DictionaryEntry>;

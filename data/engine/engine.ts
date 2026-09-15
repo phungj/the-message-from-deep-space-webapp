@@ -86,7 +86,7 @@ export function submitAnswer(
         };
     }
 
-    if (!answersEqual(parsed.signals, transmission.expectedAnswer)) {
+    if (!isAcceptableAnswer(parsed.signals, transmission)) {
         return {
             type: "wrong-answer"
         };
@@ -112,6 +112,19 @@ function answersEqual(actual: number[], expected: number[]): boolean {
         actual.length === expected.length &&
         actual.every((value, index) => value === expected[index])
     );
+}
+
+function isAcceptableAnswer(
+    actual: number[],
+    transmission: Transmission
+): boolean {
+    if (answersEqual(actual, transmission.expectedAnswer)) {
+        return true;
+    }
+
+    return transmission.otherAnswers?.some(
+        answer => answersEqual(actual, answer)
+    ) ?? false;
 }
 
 function getNextState(

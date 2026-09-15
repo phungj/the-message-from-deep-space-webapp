@@ -7,6 +7,8 @@ export interface Transmission {
     signals: number[];
     signalBasis?: SignalBasis;
     expectedAnswer: number[];
+    otherAnswers?: number[][];
+
 }
 
 export interface TransmissionGroup {

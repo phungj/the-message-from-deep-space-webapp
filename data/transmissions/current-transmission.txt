@@ -1,3 +1,2 @@
-0 comma 0 stop
-1 comma 1 stop
-2 comma 2 stop
+3 equals 2 var 0 multiply stop stop
+var 0 equals what

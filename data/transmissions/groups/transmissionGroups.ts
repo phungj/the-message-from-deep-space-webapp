@@ -5,6 +5,7 @@ import {mathOperations} from "@/data/transmissions/groups/math-operations";
 import {moreOperations} from "@/data/transmissions/groups/more-operations";
 import {fractionalNumbers} from "@/data/transmissions/groups/fractional-numbers";
 import {groups} from "@/data/transmissions/groups/groups";
+import {unknownValues} from "@/data/transmissions/groups/unknown-values";
 
 export const TRANSMISSION_GROUPS: TransmissionGroup[] = [
     helloWorld,
@@ -12,5 +13,6 @@ export const TRANSMISSION_GROUPS: TransmissionGroup[] = [
     mathOperations,
     moreOperations,
     fractionalNumbers,
-    groups
+    groups,
+    unknownValues
 ];
