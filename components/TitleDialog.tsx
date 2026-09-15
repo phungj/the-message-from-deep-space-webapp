@@ -35,6 +35,15 @@ export default function TitleDialog() {
                     After hearing the frequency, Dr. Akers remarks that the number is the hydrogen line.  It is a universal constant describing the frequency of the radiation emitted when a hydrogen atom's electron changes spin: 1,420,405 kHz.  Now, it is up to you to figure out what to send back.
                 </p>
 
+                <p className="mt-3 text-justify text-2xl whitespace-pre-line">
+                    Controls:
+
+                </p>
+
+                <ul className="list-disc list-inside mt-1 text-2xl text-left">
+                    <li>Left Control + E - Send</li>
+                </ul>
+
                 <form method="dialog">
                     <button className="btn btn-outline border-none rounded-none btn-primary mt-3 bg-white text-2xl text-black w-1/6 focus:outline-none focus:ring-0">
                         Begin

@@ -1,6 +1,14 @@
-import { useState } from "react";
+import {
+    forwardRef,
+    useImperativeHandle,
+    useState
+} from "react";
 import type { GameState } from "@/data/engine/state";
 import { submitAnswer } from "@/data/engine/engine";
+
+export interface ResponsePanelHandle {
+    submit: () => void;
+}
 
 interface ResponsePanelProps {
     state: GameState;
@@ -10,71 +18,102 @@ interface ResponsePanelProps {
     onGameComplete: () => void;
 }
 
-export default function ResponsePanel({state, onStateChange, onHydrogenOffsetUnlocked, onDecimalConversionUnlocked, onGameComplete}: ResponsePanelProps) {
-    const [input, setInput] = useState("");
-    const [displayingMessage, setDisplayingMessage] = useState(false);
+const ResponsePanel = forwardRef<ResponsePanelHandle, ResponsePanelProps>(
+    function ResponsePanel(
+        {
+            state,
+            onStateChange,
+            onHydrogenOffsetUnlocked,
+            onDecimalConversionUnlocked,
+            onGameComplete
+        },
+        ref
+    ) {
+        const [input, setInput] = useState("");
+        const [displayingMessage, setDisplayingMessage] = useState(false);
 
-    async function handleSubmit() {
-        const currentInput = input;
-        const result = submitAnswer(state, input);
+        async function handleSubmit() {
+            const currentInput = input;
 
-        if (result.type === "correct") {
-            if (result.hydrogenOffsetUnlocked) {
-                onHydrogenOffsetUnlocked();
+            if (input.trim() === "") {
+                setDisplayingMessage(true);
+                setInput("NO SIGNAL ENTERED");
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                setInput(currentInput);
+                setDisplayingMessage(false);
+                return;
             }
 
-            if (result.decimalConversionUnlocked) {
-                onDecimalConversionUnlocked();
-            }
+            const result = submitAnswer(state, input);
 
-            if (result.completed) {
-                onGameComplete();
+            if (result.type === "correct") {
+                if (result.hydrogenOffsetUnlocked) {
+                    onHydrogenOffsetUnlocked();
+                }
+
+                if (result.decimalConversionUnlocked) {
+                    onDecimalConversionUnlocked();
+                }
+
+                if (result.completed) {
+                    onGameComplete();
+                    return;
+                }
+
+                setDisplayingMessage(true);
+                setInput("NEW SIGNAL DETECTED!!");
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                onStateChange(result.nextState);
+                setInput("");
+                setDisplayingMessage(false);
                 return;
             }
 
             setDisplayingMessage(true);
-            setInput("NEW SIGNAL DETECTED!!")
+
+            if (result.type === "wrong-answer") {
+                setInput("NO SIGNAL CHANGE");
+            } else {
+                setInput(`PARSE ERROR: ${result.error}`);
+            }
+
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            onStateChange(result.nextState);
-            setInput("");
+            setInput(currentInput);
             setDisplayingMessage(false);
-            return;
         }
 
-        setDisplayingMessage(true);
+        useImperativeHandle(ref, () => ({
+            submit: handleSubmit
+        }));
 
-        if (result.type === "wrong-answer") {
-            setInput("NO SIGNAL CHANGE");
-        } else {
-            setInput(`PARSE ERROR: ${result.error}`)
-        }
+        return (
+            <section className="border border-base-300 relative p-4">
+                <h2 className="font-title text-heading text-5xl font-bold">
+                    RESPONSE
+                </h2>
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setInput(currentInput)
-        setDisplayingMessage(false);
+                <textarea
+                    value={input}
+                    onChange={event => setInput(event.target.value)}
+                    disabled={displayingMessage}
+                    className="mt-8 block w-[23ch] h-80/100 resize-none uppercase overflow-y-auto font-mono mx-auto text-4xl border border-base-300 pl-2 pt-2"
+                />
+
+                <button
+                    onClick={handleSubmit}
+                    disabled={displayingMessage}
+                    className="btn btn-primary border-none rounded-none absolute top-4 right-4 bg-white h-1/20 text-5xl text-black w-1/4"
+                >
+                    SEND
+                </button>
+            </section>
+        );
     }
+);
 
-    return (
-        <section className="border border-base-300 p-4">
-            <h2 className="font-title text-heading text-5xl font-bold">
-                RESPONSE
-            </h2>
-
-            <textarea
-                value={input}
-                onChange={event => setInput(event.target.value)}
-                disabled={displayingMessage}
-                className="mt-8 block w-[23ch] h-80/100 resize-none uppercase overflow-y-auto font-mono mx-auto text-4xl border border-base-300 pl-2 pt-2"
-            />
-
-            <button
-                onClick={handleSubmit}
-                disabled={displayingMessage}
-                className="btn btn-primary border-none rounded-none mt-10 bg-white h-1/20 text-5xl text-black w-1/4"
-            >
-                SEND
-            </button>
-        </section>
-    );
-}
+export default ResponsePanel;

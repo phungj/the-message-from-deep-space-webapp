@@ -2,9 +2,9 @@
 
 import ReferencePanel from "@/components/ReferencePanel";
 import TransmissionPanel from "@/components/TransmissionPanel";
-import ResponsePanel from "@/components/ResponsePanel";
+import ResponsePanel, {ResponsePanelHandle} from "@/components/ResponsePanel";
 import {GameState, INITIAL_GAME_STATE} from "@/data/engine/state";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import HydrogenLineOffsetUnlockDialog from "@/components/HydrogenLineOffsetUnlockDialog";
 import DecimalConversionUnlockDialog from "@/components/DecimalConversionUnlockDialog";
 import GameCompletionDialog from "@/components/GameCompletionDialog";
@@ -33,6 +33,8 @@ export default function App() {
     const [showCompletion, setShowCompletion] = useState(false);
     const [hydrated, setHydrated] = useState(false);
 
+    const responsePanelRef = useRef<ResponsePanelHandle>(null);
+
     useEffect(() => {
         const savedState = loadGame();
 
@@ -50,6 +52,21 @@ export default function App() {
             saveGame(gameState);
         }
     }, [gameState, hydrated]);
+
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.ctrlKey && event.key.toLowerCase() === "e") {
+                event.preventDefault();
+                responsePanelRef.current?.submit();
+            }
+        }
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
 
     if (!hydrated) {
         return null;
@@ -75,6 +92,7 @@ export default function App() {
                 <TransmissionPanel state={gameState}/>
 
                 <ResponsePanel
+                    ref={responsePanelRef}
                     state={gameState}
                     onStateChange={setGameState}
 

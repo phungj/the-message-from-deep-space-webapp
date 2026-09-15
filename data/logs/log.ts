@@ -34,7 +34,10 @@ Dr. Your Name - Translator
 
 After hearing the frequency, Dr. Akers remarks that the number is the hydrogen line. It is a universal constant describing the frequency of the radiation emitted when a hydrogen atom's electron changes spin: 1,420,405 kHz.
 
-Now, it is up to you to figure out what to send back.`,
+Now, it is up to you to figure out what to send back.
+
+Controls:
+Left Control + E - Send`,
         unlockAfterTransmissionID: INTRODUCTION_UNLOCK_ID
     },
     {
