@@ -4,6 +4,7 @@ export interface DictionaryEntry {
     word: string;
     prefix: SignalSeparator;
     postfix: SignalSeparator;
+    breakOnRepeat: boolean;
 }
 
 export const DEV_SIGNALS = {
@@ -17,7 +18,8 @@ export const DEV_SIGNALS = {
     OCTAL_POINT: -10,
     COMMA: -3,
     VAR: -11,
-    WHAT: -12
+    WHAT: -12,
+    AS: -13
 } as const;
 
 export type UserDictionary = Record<number, DictionaryEntry>;
@@ -27,7 +29,8 @@ export function addDictionaryEntry(
     signal: number,
     word: string,
     prefix: SignalSeparator = "space",
-    postfix: SignalSeparator = "newline"
+    postfix: SignalSeparator = "newline",
+    breakOnRepeat: boolean = false
 ): UserDictionary {
     if (signal >= 0) {
         throw new Error("Dictionary signals must be negative offsets.");
@@ -38,30 +41,12 @@ export function addDictionaryEntry(
         [signal]: {
             word,
             prefix,
-            postfix
+            postfix,
+            breakOnRepeat
         }
     };
 }
 
-export function updateDictionaryWord(
-    dictionary: UserDictionary,
-    signal: number,
-    word: string
-): UserDictionary {
-    const entry = dictionary[signal];
-
-    if (!entry) {
-        throw new Error(`Unknown dictionary signal: ${signal}`);
-    }
-
-    return {
-        ...dictionary,
-        [signal]: {
-            ...entry,
-            word
-        }
-    };
-}
 export function removeDictionaryEntry(
     dictionary: UserDictionary,
     signal: number
@@ -75,6 +60,7 @@ export function createUndefinedEntry(signal: number): DictionaryEntry {
     return {
         word: `@${signal}_UNDEF`,
         prefix: "space",
-        postfix: "newline"
+        postfix: "newline",
+        breakOnRepeat: false
     };
 }

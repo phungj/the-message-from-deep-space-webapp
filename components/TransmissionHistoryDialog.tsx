@@ -3,7 +3,7 @@ import {
     getTransmissionHistory,
     isTransmissionGroupCompleted
 } from "@/data/engine/engine";
-import { TRANSMISSION_GROUPS } from "@/data/transmissions/groups/transmissionGroups";
+import { TRANSMISSION_GROUPS } from "@/data/transmissions/groups/transmission-groups";
 import { useState } from "react";
 import {
     formatSignals,

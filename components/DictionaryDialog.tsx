@@ -1,5 +1,5 @@
+import {Fragment, useState} from "react";
 import {GameState} from "@/data/engine/state";
-import {useState} from "react";
 import {
     addDictionaryEntry,
     removeDictionaryEntry,
@@ -121,6 +121,7 @@ export default function DictionaryDialog({
                 ...state.dictionary,
                 [signal]: {
                     ...state.dictionary[signal],
+                    breakOnRepeat: state.dictionary[signal].breakOnRepeat ?? false,
                     word
                 }
             }
@@ -148,7 +149,30 @@ export default function DictionaryDialog({
                 ...state.dictionary,
                 [signal]: {
                     ...entry,
+                    breakOnRepeat: entry.breakOnRepeat ?? false,
                     [type]: value
+                }
+            }
+        });
+    }
+
+    function handleBreakOnRepeatChange(
+        signal: number,
+        value: boolean
+    ) {
+        const entry = state.dictionary[signal];
+
+        if (!entry) {
+            return;
+        }
+
+        onStateChange({
+            ...state,
+            dictionary: {
+                ...state.dictionary,
+                [signal]: {
+                    ...entry,
+                    breakOnRepeat: value
                 }
             }
         });
@@ -210,11 +234,9 @@ export default function DictionaryDialog({
                     maxLength={16}
                     value={addWordInput}
                     onChange={event => {
-                        const value = event.target.value.toUpperCase();
+                        const value = sanitizeWordInput(event.target.value);
 
-                        if (
-                            /^[A-Z!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/.test(value)
-                        ) {
+                        if (value !== null) {
                             setAddWordInput(value);
                             setError("");
                         }
@@ -270,93 +292,147 @@ export default function DictionaryDialog({
 
                     <tbody>
                     {entries.map(([signal, entry]) => (
-                        <tr key={signal}>
-                            <td className="font-mono text-xl py-2 px-2 text-center">
-                                {signal}
-                            </td>
+                        <Fragment key={signal}>
+                            <tr>
+                                <td className="font-mono text-xl py-2 px-2 text-center">
+                                    {signal}
+                                </td>
 
-                            <td className="py-2 px-2">
-                                <input
-                                    className="input input-bordered bg-black w-full text-xl text-center font-mono px-0"
-                                    maxLength={16}
-                                    value={
-                                        editingSignal === Number(signal)
-                                            ? editWordInput
-                                            : entry.word
-                                    }
-                                    onFocus={() => {
-                                        setEditingSignal(Number(signal));
-                                        setEditWordInput(entry.word);
-                                    }}
-                                    onChange={event => {
-                                        setEditWordInput(
-                                            event.target.value
-                                                .replace(/\s/g, "")
-                                                .toUpperCase()
-                                        );
-                                    }}
-                                    onKeyDown={event => {
-                                        if (event.key === "Enter") {
-                                            event.currentTarget.blur();
+                                <td className="py-2 px-2">
+                                    <input
+                                        className="input input-bordered bg-black w-full text-xl text-center font-mono px-0"
+                                        maxLength={16}
+                                        value={
+                                            editingSignal === Number(signal)
+                                                ? editWordInput
+                                                : entry.word
                                         }
-                                    }}
-                                    onBlur={() => {
-                                        if (editingSignal === Number(signal)) {
-                                            handleWordSubmit(Number(signal));
+                                        onFocus={() => {
+                                            setEditingSignal(Number(signal));
+                                            setEditWordInput(entry.word);
+                                        }}
+                                        onChange={event => {
+                                            const value = sanitizeWordInput(event.target.value);
+
+                                            if (value !== null) {
+                                                setEditWordInput(value);
+                                                setError("");
+                                            }
+                                        }}
+                                        onKeyDown={event => {
+                                            if (event.key === "Enter") {
+                                                event.currentTarget.blur();
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (editingSignal === Number(signal)) {
+                                                handleWordSubmit(Number(signal));
+                                            }
+                                        }}
+                                    />
+                                </td>
+
+                                <td className="py-2 px-2">
+                                    <select
+                                        className="select select-lg select-bordered bg-black w-full text-center appearance-none bg-none"
+                                        value={entry.prefix}
+                                        onChange={event =>
+                                            handleSeparatorChange(
+                                                Number(signal),
+                                                "prefix",
+                                                event.target.value as SignalSeparator
+                                            )
                                         }
-                                    }}
-                                />
-                            </td>
+                                    >
+                                        {SEPARATOR_OPTIONS.map(option => (
+                                            <option key={option} value={option}>
+                                                {separatorLabel(option)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
 
-                            <td className="py-2 px-2">
-                                <select
-                                    className="select select-lg select-bordered bg-black w-full text-center appearance-none bg-none"
-                                    value={entry.prefix}
-                                    onChange={event =>
-                                        handleSeparatorChange(
-                                            Number(signal),
-                                            "prefix",
-                                            event.target.value as SignalSeparator
-                                        )
-                                    }
-                                >
-                                    {SEPARATOR_OPTIONS.map(option => (
-                                        <option key={option} value={option}>
-                                            {separatorLabel(option)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </td>
+                                <td className="py-2 px-2">
+                                    <select
+                                        className="select select-lg select-bordered bg-black w-full text-center appearance-none bg-none"
+                                        value={entry.postfix}
+                                        onChange={event =>
+                                            handleSeparatorChange(
+                                                Number(signal),
+                                                "postfix",
+                                                event.target.value as SignalSeparator
+                                            )
+                                        }
+                                    >
+                                        {SEPARATOR_OPTIONS.map(option => (
+                                            <option key={option} value={option}>
+                                                {separatorLabel(option)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
 
-                            <td className="py-2 px-2">
-                                <select
-                                    className="select select-lg select-bordered bg-black w-full text-center appearance-none bg-none"
-                                    value={entry.postfix}
-                                    onChange={event =>
-                                        handleSeparatorChange(
-                                            Number(signal),
-                                            "postfix",
-                                            event.target.value as SignalSeparator
-                                        )
-                                    }
-                                >
-                                    {SEPARATOR_OPTIONS.map(option => (
-                                        <option key={option} value={option}>
-                                            {separatorLabel(option)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </td>
+                                <td className="py-2 px-2 text-center">
+                                    <button
+                                        className="btn btn-sm border-none rounded-none btn-error bg-white text-xl text-black w-24"
+                                        onClick={() =>
+                                            handleDelete(Number(signal))
+                                        }
+                                    >
+                                        DELETE
+                                    </button>
+                                </td>
+                            </tr>
 
-                            <td className="py-2 px-2 text-center">
-                                <button
-                                    className="btn btn-sm border-none rounded-none btn-error bg-white text-xl text-black w-24"
-                                    onClick={() => handleDelete(Number(signal))}
+                            <tr>
+                                <td />
+                                <td />
+
+                                <td
+                                    colSpan={2}
+                                    className="px-2 pb-2"
                                 >
-                                    DELETE
-                                </button>
-                            </td>
-                        </tr>
+                                    <label className="flex items-center justify-center gap-3 cursor-pointer">
+            <span className="font-title text-lg">
+                BREAK ON DOUBLE
+            </span>
+
+                                        <input
+                                            type="checkbox"
+                                            className="
+                    appearance-none
+                    w-5 h-5
+                    rounded-none
+                    border-2 border-white
+                    bg-white
+                    checked:bg-white
+                    relative
+                    cursor-pointer
+                    after:absolute
+                    after:left-1/2
+                    after:top-1/2
+                    after:-translate-x-1/2
+                    after:-translate-y-1/2
+                    after:w-2
+                    after:h-2
+                    after:bg-black
+                    after:opacity-0
+                    checked:after:opacity-100
+                "
+                                            checked={entry.breakOnRepeat ?? false}
+                                            onChange={event =>
+                                                handleBreakOnRepeatChange(
+                                                    Number(signal),
+                                                    event.target.checked
+                                                )
+                                            }
+                                        />
+                                    </label>
+                                </td>
+
+                                <td />
+                            </tr>
+                        </Fragment>
                     ))}
                     </tbody>
                 </table>
@@ -390,4 +466,17 @@ function validateWord(
     }
 
     return null;
+}
+
+const WORD_CHARACTER_PATTERN =
+    /^[A-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+
+function sanitizeWordInput(value: string): string | null {
+    const word = value
+        .replace(/\s/g, "")
+        .toUpperCase();
+
+    return WORD_CHARACTER_PATTERN.test(word)
+        ? word
+        : null;
 }

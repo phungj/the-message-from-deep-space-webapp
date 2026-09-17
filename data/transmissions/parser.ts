@@ -33,8 +33,16 @@ function prepareSignals(
     hydrogenLineUnconverted: boolean,
     dictionary: UserDictionary
 ): DisplaySignal[] {
-    return signals.map(signal => {
+    return signals.map((signal, index) => {
         const entry = dictionary[signal];
+
+        const isRepeated =
+            index > 0 &&
+            signal === signals[index - 1];
+
+        const shouldBreakOnRepeat =
+            isRepeated &&
+            entry?.breakOnRepeat === true;
 
         return {
             value: entry?.word ?? (
@@ -42,18 +50,21 @@ function prepareSignals(
                     ? signal.toString(10)
                     : signal.toString(base)
             ),
-            prefix: entry?.prefix ?? (signal < 0 ? "space" : "none"),
+            prefix:
+                entry?.prefix ??
+                (signal < 0 ? "space" : "none"),
             postfix:
-                entry?.postfix ??
-                (signal < 0
+                shouldBreakOnRepeat
                     ? "newline"
-                    : hydrogenLineUnconverted
-                        ? "space"
-                        : "none")
+                    : entry?.postfix ??
+                    (signal < 0
+                        ? "newline"
+                        : hydrogenLineUnconverted
+                            ? "space"
+                            : "none")
         };
     });
 }
-
 export function prepareTransmissionSignals(
     signals: number[],
     transmission: Transmission,

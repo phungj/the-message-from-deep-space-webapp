@@ -73,19 +73,23 @@ function isDevSignal(token: string): token is keyof typeof DEV_SIGNALS {
 }
 
 function parseNumber(token: string, base: Base, line: number): string {
-    const pattern = base === 8 ? /^[0-7]+$/ : /^\d+$/;
+    if (base === 10) {
+        if (!/^\d+(?:\.\d+)?$/.test(token)) {
+            throw new Error(
+                `Line ${line}: invalid base-10 number "${token}"`
+            );
+        }
 
-    if (!pattern.test(token)) {
+        return token;
+    }
+
+    if (!/^[0-7]+$/.test(token)) {
         throw new Error(
-            `Line ${line}: invalid base-${base} number "${token}"`
+            `Line ${line}: invalid base-8 number "${token}"`
         );
     }
 
-    const value = parseInt(token, base);
-
-    return base === 8
-        ? `0o${value.toString(8)}`
-        : value.toString(10);
+    return `0o${token}`;
 }
 
 function parseToken(token: string, base: Base, line: number): string {
@@ -95,11 +99,7 @@ function parseToken(token: string, base: Base, line: number): string {
         return `DEV_SIGNALS.${normalizedToken}`;
     }
 
-    if (/^\d+$/.test(token)) {
-        return parseNumber(token, base, line);
-    }
-
-    throw new Error(`Line ${line}: unknown signal "${token}"`);
+    return parseNumber(token, base, line);
 }
 
 function parseTransmissionSignals(

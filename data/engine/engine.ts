@@ -1,6 +1,6 @@
 import type { Transmission } from "@/data/transmissions/transmission";
 import type { GameState} from "@/data/engine/state";
-import {TRANSMISSION_GROUPS} from "@/data/transmissions/groups/transmissionGroups";
+import {TRANSMISSION_GROUPS} from "@/data/transmissions/groups/transmission-groups";
 import {
     DisplaySignal,
     parseSignalInput,
